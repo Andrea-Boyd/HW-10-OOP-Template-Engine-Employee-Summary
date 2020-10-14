@@ -10,7 +10,86 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+let employees = []
+let roles = ["Manager", "Engineer", "Intern"]
+function getInfo(){
 
+    inquirer.prompt([
+        { 
+            type: "input",
+            name: "name",
+            message: "What is the new employee's name?"
+        },
+        {
+            type: "input",
+            name: "id",
+        message: "What is the new employee's id?"
+    },
+    {
+        type: "input",
+        name: "email",
+        message: "What is the new employee's email?"
+    },
+    {
+        type: "list",
+        name: "role",
+        message: "What role is the new Employee hired as?",
+        choices: roles
+    }
+]).then(function(basicInfo) {
+    if(basicInfo.role == "Manager"){
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "officeNum",
+                message: "Yo what's your office number man, bro?"
+            }
+        ]).then(function(managerInfo){
+            var manager = new Manager(basicInfo.name, basicInfo.id, basicInfo.email, managerInfo.officeNum);
+            employees.push(manager)
+            fs.writeFile(outputPath, render(employees), err => {if (err) throw err})
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "next",
+                    message: "Do you have another employee to enter?",
+                    choices: ["yes", "no"]
+                }
+            ]).then(function(confirmation){
+                if(confirmation.next == "yes"){
+                    getInfo()
+                }else{
+                    return
+                }
+            })
+        })
+    }else if(basicInfo.role == "Engineer") {
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "github",
+                message: "What is the engineer's github?"
+            }
+        ]).then(function(engineerInfo){
+            console.log(basicInfo)
+            console.log(engineerInfo)
+        })
+    }else if(basicInfo.role == "Intern") {
+        inquirer.prompt([
+            {
+                type: "input",
+                name: "school",
+                message: "What school are you attending?"
+            }
+        ]).then(function(internInfo){
+            console.log(basicInfo)
+            console.log(internInfo)
+        })
+    }
+    
+})
+}
+getInfo()
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 
